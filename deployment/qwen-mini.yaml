@@ -1,87 +1,69 @@
+# qwen-gpu-deployment.yaml
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: qwen-mini
 spec:
-  serviceName: "qwen-service"
   replicas: 1
   selector:
     matchLabels:
       app: qwen
+  strategy:
+    type: Recreate  # 确保单副本模式安全更新
   template:
     metadata:
       labels:
         app: qwen
     spec:
-      terminationGracePeriodSeconds: 600
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - qwen
-              topologyKey: kubernetes.io/hostname
+      # 添加节点选择器，确保调度到有模型的节点
+      nodeName: minikube  # 替换为您的实际节点名
+      
       containers:
-        - name: text-generation
-          image: ghcr.io/huggingface/text-generation-inference:1.4.1
+        - name: qwen-inference
+          image: nvcr.io/nvidia/pytorch:24.05-py3  # 官方支持CUDA的镜像
           command: ["/bin/sh", "-c"]
           args:
             - |
-              # 安装兼容的bitsandbytes
+              # 安装依赖
+              pip install transformers==4.40.0 accelerate==0.29.3
               
-              # 诊断环境
-              echo "===== 环境诊断信息 ====="
-              echo "CUDA_HOME: $CUDA_HOME"
-              echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-              ls -l $CUDA_HOME
-              nvidia-smi
+              # 启动模型服务
+              python -m transformers.onnx --model=/model --feature=text-generation
+              python -c "from transformers import pipeline; pipe = pipeline('text-generation', model='/model', device=0); print(pipe('Hello, how are you?', max_new_tokens=50))"
               
-              # 启动服务
-              text-generation-launcher \
-                --model-id /model \
-                --num-shard 1 \
-                --port 8000 \
-                --quantize bitsandbytes
-              
+              # 保持容器运行
               sleep infinity
           env:
-            - name: TRANSFORMERS_OFFLINE
-              value: "1"
-            - name: HF_HUB_OFFLINE
-              value: "1"
-            - name: NVIDIA_DISABLE_REQUIRE
-              value: "1"
-            - name: LD_LIBRARY_PATH
-              value: "/usr/lib/x86_64-linux-gnu:/usr/local/cuda/lib64:/usr/local/nvidia/lib64"
-            - name: CUDA_HOME
-              value: "/usr/local/cuda-12.1"
+            - name: CUDA_VISIBLE_DEVICES
+              value: "0"  # 指定使用第一个GPU
             - name: NVIDIA_VISIBLE_DEVICES
               value: "all"
             - name: NVIDIA_DRIVER_CAPABILITIES
               value: "compute,utility"
-            - name: FORCE_CUDA
-              value: "1"
+            - name: LD_LIBRARY_PATH
+              value: "/usr/local/cuda/lib64:/usr/local/nvidia/lib64:$LD_LIBRARY_PATH"
           resources:
             limits:
-              nvidia.com/microgpu: 1
-            requests:
-              nvidia.com/microgpu: 1
-          ports:
-            - containerPort: 8000
+              nvidia.com/microgpu: 1  # 申请1个microgpu资源
           volumeMounts:
             - name: model-storage
               mountPath: /model
-            - name: nvidia-driver-lib
-              mountPath: /usr/local/nvidia/lib64
       volumes:
         - name: model-storage
           hostPath:
             path: /home/k8sadmin/Qwen1.5-0.5B-Chat
             type: Directory
-        - name: nvidia-driver-lib
-          hostPath:
-            path: /usr/lib/x86_64-linux-gnu
-            type: Directory
+
+---
+# 验证服务（可选）
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen-test
+spec:
+  selector:
+    app: qwen
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888

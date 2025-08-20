@@ -15,6 +15,7 @@ kubectl get pod
 kubectl describe pod -l app=qwen 
 kubectl logs -f -l app=qwen
 kubectl delete pod -l app=qwen
+kubectl delete pod qwen-mini-0 --force --grace-period=0
 kubectl delete deployment qwen-mini
 kubectl delete statefulset qwen-mini
 
