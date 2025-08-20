@@ -22,5 +22,15 @@ kubectl exec -it qwen-mini-0 -- sh
 
 kubectl logs -f pod cuda-test
 kubectl logs -f -l app=qwen
+kubectl exec -it qwen-mini-0 -- bash
+# 检查CUDA
+nvidia-smi
+ls -l /usr/local/cuda
+
+# 检查PyTorch
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+
+# 检查bitsandbytes
+python -c "import bitsandbytes; print(bitsandbytes.__version__)"
 
 ```
