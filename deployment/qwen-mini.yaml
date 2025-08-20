@@ -6,7 +6,7 @@ metadata:
 spec:
   serviceName: "qwen-service"
   replicas: 1
-  podManagementPolicy: OrderedReady  # 确保一次只处理一个Pod
+  podManagementPolicy: OrderedReady
   selector:
     matchLabels:
       app: qwen
@@ -15,7 +15,7 @@ spec:
       labels:
         app: qwen
     spec:
-      terminationGracePeriodSeconds: 120  # 给Pod足够的时间优雅终止
+      terminationGracePeriodSeconds: 600  # 延长终止宽限期，方便调试
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -29,16 +29,43 @@ spec:
       containers:
         - name: text-generation
           image: ghcr.io/huggingface/text-generation-inference:1.4.1
-          command: ["text-generation-launcher"]
+          command: ["/bin/sh", "-c"]  # 改为shell模式执行
           args:
-            - "--model-id"
-            - "/model"
-            - "--num-shard"
-            - "1"
-            - "--port"
-            - "8000"
-            - "--quantize"
-            - "bitsandbytes"
+            - |
+              # 诊断环境变量
+              echo "===== 环境诊断信息 ====="
+              echo "当前时间: $(date)"
+              echo "CUDA环境:"
+              ls -l /usr/local/cuda*
+              echo "驱动库路径:"
+              ls -l /usr/local/nvidia/lib64
+              echo "环境变量:"
+              printenv | sort
+              
+              # 检查CUDA设备
+              echo "===== 设备检查 ====="
+              ls -l /dev/nvidia*
+              nvidia-smi
+              
+              # 检查PyTorch CUDA支持
+              echo "===== PyTorch检查 ====="
+              python -c "import torch; print(f'PyTorch版本: {torch.__version__}, CUDA可用: {torch.cuda.is_available()}')"
+              
+              # 检查bitsandbytes
+              echo "===== bitsandbytes检查 ====="
+              python -c "import bitsandbytes; print(f'bitsandbytes版本: {bitsandbytes.__version__}'); print(f'CUDA支持: {bitsandbytes.CUDASetup.get_instance().is_initialized}')"
+              
+              # 启动服务（保留原始命令）
+              echo "===== 启动服务 ====="
+              text-generation-launcher \
+                --model-id /model \
+                --num-shard 1 \
+                --port 8000 \
+                --quantize bitsandbytes
+              
+              # 保持容器运行（诊断模式）
+              echo "===== 进入诊断模式 ====="
+              sleep infinity
           env:
             - name: TRANSFORMERS_OFFLINE
               value: "1"
@@ -46,27 +73,37 @@ spec:
               value: "1"
             - name: NVIDIA_DISABLE_REQUIRE
               value: "1"
-          # 添加就绪探针，确保Pod完全启动后才被认为是就绪
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            failureThreshold: 10
-            timeoutSeconds: 5
-          # 添加存活探针，确保应用健康
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 60
-            periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 5
+            # 新增关键环境变量
+            - name: LD_LIBRARY_PATH
+              value: "/usr/local/nvidia/lib64:/usr/local/cuda/lib64:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+            - name: CUDA_HOME
+              value: "/usr/local/cuda"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "compute,utility"
+            - name: FORCE_CUDA
+              value: "1"  # 强制启用CUDA
+          # 临时禁用探针，防止容器重启
+          #readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 8000
+          #  initialDelaySeconds: 120
+          #  periodSeconds: 10
+          #  failureThreshold: 30
+          #livenessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: 8000
+          #  initialDelaySeconds: 180
+          #  periodSeconds: 20
+          #  failureThreshold: 10
           resources:
             limits:
               nvidia.com/microgpu: 1
+            requests:
+              nvidia.com/microgpu: 1  # 添加请求确保调度
           ports:
             - containerPort: 8000
           volumeMounts:
@@ -77,11 +114,10 @@ spec:
           hostPath:
             path: /home/k8sadmin/Qwen1.5-0.5B-Chat
             type: Directory
-  # StatefulSet更新策略
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      partition: 0  # 确保有序更新
+      partition: 0
 
 ---
 apiVersion: v1
