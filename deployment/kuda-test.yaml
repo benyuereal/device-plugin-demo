@@ -7,10 +7,34 @@ spec:
   restartPolicy: OnFailure
   containers:
     - name: cuda-test
-      image: nvidia/cuda:11.6.2-base-ubuntu20.04
+      # 使用预装完整工具链的 PyTorch 官方镜像
+      image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
       command: ["sh", "-c"]
       args:
-        - "nvidia-smi && python -c 'import torch; print(f\"CUDA available: {torch.cuda.is_available()}\")'"
+        # 安装依赖 + 执行真实 GPU 计算任务
+        - |
+          nvidia-smi
+          # 执行真实 GPU 计算测试（矩阵乘法）
+          python -c "
+          import torch
+          print(f'PyTorch version: {torch.__version__}')
+          print(f'CUDA available: {torch.cuda.is_available()}')
+          
+          if torch.cuda.is_available():
+              device = torch.device('cuda')
+              # 创建两个大矩阵 (8192x8192)
+              a = torch.randn(8192, 8192, device=device)
+              b = torch.randn(8192, 8192, device=device)
+              # GPU 矩阵乘法计算
+              c = a @ b
+              print(f'Matrix shape: {c.shape}')
+              print('GPU calculation successful!')
+              # 显存压力测试
+              tensors = [torch.zeros(1024,1024, device=device) for _ in range(500)]
+              print(f'Created {len(tensors)} tensors on GPU')
+          else:
+              print('CUDA not available')
+          "
       resources:
         limits:
-          nvidia.com/microgpu: 1
+          nvidia.com/microgpu: 1  # 确保与您的 device plugin 名称一致
