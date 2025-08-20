@@ -1,3 +1,4 @@
+# cuda-test.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -7,13 +8,9 @@ spec:
   containers:
     - name: cuda-test
       image: nvidia/cuda:11.6.2-base-ubuntu20.04
-      command: ["bash", "-c"]
+      command: ["sh", "-c"]
       args:
-        - |
-          apt update && apt install -y python3-pip && \
-          pip3 install torch==1.12.1+cu116 -f https://download.pytorch.org/whl/torch_stable.html && \
-          nvidia-smi && \
-          python3 -c 'import torch; print(f"CUDA available: {torch.cuda.is_available()}")'
+        - "nvidia-smi && python -c 'import torch; print(f\"CUDA available: {torch.cuda.is_available()}\")'"
       resources:
         limits:
           nvidia.com/microgpu: 1
