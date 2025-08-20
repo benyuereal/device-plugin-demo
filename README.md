@@ -20,5 +20,7 @@ kubectl delete statefulset qwen-mini
 
 kubectl exec -it qwen-mini-0 -- sh
 
+kubectl logs -f pod cuda-test
+kubectl logs -f -l app=qwen
 
 ```
