@@ -1,0 +1,16 @@
+# cuda-test.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-test
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: cuda-test
+      image: nvidia/cuda:11.6.2-base-ubuntu20.04
+      command: ["sh", "-c"]
+      args:
+        - "nvidia-smi && python -c 'import torch; print(f\"CUDA available: {torch.cuda.is_available()}\")'"
+      resources:
+        limits:
+          nvidia.com/microgpu: 1
