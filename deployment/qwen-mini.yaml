@@ -15,6 +15,16 @@ spec:
       labels:
         app: qwen
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - qwen
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: text-generation
           image: ghcr.io/huggingface/text-generation-inference:1.4.1
