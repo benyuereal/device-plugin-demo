@@ -5,6 +5,8 @@ metadata:
   name: qwen-mini
 spec:
   replicas: 1
+  strategy:
+    type: Recreate  # 禁止并行启动Pod
   selector:
     matchLabels:
       app: qwen
