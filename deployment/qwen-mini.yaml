@@ -46,12 +46,6 @@ spec:
               value: "1"
             - name: NVIDIA_DISABLE_REQUIRE
               value: "1"
-            - name: LD_LIBRARY_PATH
-              value: /host-lib:/usr/local/nvidia/lib64:/usr/local/nvidia/lib
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: all
-          securityContext: # 添加设备访问权限
-            privileged: true
           # 添加就绪探针，确保Pod完全启动后才被认为是就绪
           readinessProbe:
             httpGet:
@@ -78,27 +72,11 @@ spec:
           volumeMounts:
             - name: model-storage
               mountPath: /model
-            - name: nvidia-devices
-              mountPath: /dev/nvidiactl
-            - name: nvidia-devices
-              mountPath: /dev/nvidia-uvm
-            - name: nvidia-devices
-              mountPath: /dev/nvidia-uvm-tools
-            - name: nvidia-devices
-              mountPath: /dev/nvidia-modeset
-            - name: nvidia-libs
-              mountPath: /host-lib
       volumes:
         - name: model-storage
           hostPath:
             path: /home/k8sadmin/Qwen1.5-0.5B-Chat
             type: Directory
-        - name: nvidia-devices
-          hostPath:
-            path: /dev
-        - name: nvidia-libs
-          hostPath:
-            path: /usr/lib/x86_64-linux-gnu
   # StatefulSet更新策略
   updateStrategy:
     type: RollingUpdate
