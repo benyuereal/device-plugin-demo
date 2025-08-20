@@ -16,4 +16,5 @@ kubectl logs -f -l app=qwen
 kubectl delete pod -l app=qwen
 kubectl delete deployment qwen-mini
 
+kubectl exec  -it qwen-mini-0  -- sh
 ```
