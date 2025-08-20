@@ -5,6 +5,8 @@ device-plugin
 ### 应用
 ```shell
 kubectl apply -f deployment/qwen-mini.yaml
+kubectl apply -f deployment/gpu-test.yaml
+
 ```
 
 ```shell
@@ -13,4 +15,5 @@ kubectl describe pod -l app=qwen
 kubectl logs -f -l app=qwen
 kubectl delete pod -l app=qwen
 kubectl delete deployment qwen-mini
+
 ```
