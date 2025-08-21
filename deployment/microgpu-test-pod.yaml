@@ -29,8 +29,13 @@ spec:
       volumeMounts:
         - name: model-storage
           mountPath: /model
+        - name: cuda-lib
+          mountPath: /usr/local/nvidia/lib64 # 容器内标准路径
   volumes:
     - name: model-storage
       hostPath:
         path: /home/k8sadmin/Qwen1.5-0.5B-Chat
         type: Directory
+    - name: cuda-lib
+      hostPath:
+        path: /usr/lib/x86_64-linux-gnu
