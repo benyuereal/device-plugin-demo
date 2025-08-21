@@ -7,6 +7,7 @@ device-plugin
 kubectl apply -f deployment/qwen-mini.yaml
 kubectl apply -f deployment/gpu-test.yaml
 kubectl apply -f deployment/kuda-test.yaml
+kubectl apply -f deployment/microgpu-test-pod.yaml
 
 ```
 

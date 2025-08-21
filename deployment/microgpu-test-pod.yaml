@@ -10,7 +10,7 @@ spec:
       command: ["/bin/bash", "-c"]
       args:
         - >
-          pip install transformers accelerate &&
+          pip install transformers torch accelerate -i https://pypi.tuna.tsinghua.edu.cn/simple &&
           python -c "
           from transformers import AutoModelForCausalLM, AutoTokenizer
           import torch;
