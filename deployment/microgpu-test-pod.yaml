@@ -10,6 +10,9 @@ spec:
       command: ["/bin/bash", "-c"]
       args:
         - >
+          python -m venv /app/venv &&
+          source /app/venv/bin/activate &&
+          pip install --upgrade pip &&
           pip install transformers torch accelerate -i https://pypi.tuna.tsinghua.edu.cn/simple &&
           python -c "
           from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -23,14 +26,14 @@ spec:
           print(tokenizer.decode(outputs[0], skip_special_tokens=True))"
       resources:
         requests:
-          nvidia.com/microgpu: 1  # 请求自定义GPU资源
+          nvidia.com/microgpu: 1
         limits:
           nvidia.com/microgpu: 1
       volumeMounts:
         - name: model-storage
           mountPath: /model
         - name: cuda-lib
-          mountPath: /usr/local/nvidia/lib64 # 容器内标准路径
+          mountPath: /usr/local/nvidia/lib64
   volumes:
     - name: model-storage
       hostPath:
