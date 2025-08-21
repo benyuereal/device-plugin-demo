@@ -3,27 +3,11 @@ kind: Pod
 metadata:
   name: microgpu-test-pod
 spec:
-  restartPolicy: OnFailure
+  restartPolicy: Never  # 执行完成后不重启
   containers:
     - name: qwen-inference
       image: nvcr.io/nvidia/pytorch:24.05-py3
-      command: ["/bin/bash", "-c"]
-      args:
-        - >
-          python -m venv /app/venv &&
-          source /app/venv/bin/activate &&
-          pip install --upgrade pip &&
-          pip install transformers torch accelerate -i https://pypi.tuna.tsinghua.edu.cn/simple &&
-          python -c "
-          from transformers import AutoModelForCausalLM, AutoTokenizer
-          import torch;
-          device = 'cuda:0' if torch.cuda.is_available() else 'cpu';
-          print(f'Using device: {device}');
-          model = AutoModelForCausalLM.from_pretrained('/model', torch_dtype=torch.float16, device_map=device);
-          tokenizer = AutoTokenizer.from_pretrained('/model');
-          inputs = tokenizer('你好，请介绍一下你自己', return_tensors='pt').to(device);
-          outputs = model.generate(**inputs, max_new_tokens=50);
-          print(tokenizer.decode(outputs[0], skip_special_tokens=True))"
+      command: ["sleep", "infinity"]  # 保持容器运行
       resources:
         requests:
           nvidia.com/microgpu: 1
