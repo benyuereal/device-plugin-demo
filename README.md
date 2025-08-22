@@ -27,6 +27,8 @@ kubectl logs -f pod cuda-test
 kubectl logs -f -l app=qwen
 kubectl exec -it qwen-mini-0 -- bash
 kubectl delete pod microgpu-test-pod
+kubectl describe pod microgpu-test-pod
+kubectl exec -it microgpu-test-pod -- sh
 
 kubectl get pod microgpu-test -w
 kubectl describe pod -l microgpu-test

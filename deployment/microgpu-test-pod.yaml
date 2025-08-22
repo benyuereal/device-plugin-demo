@@ -13,10 +13,6 @@ spec:
           nvidia.com/microgpu: 1
         limits:
           nvidia.com/microgpu: 1
-      env:
-        # 确保包含所有可能的库路径
-        - name: LD_LIBRARY_PATH
-          value: /usr/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib:/usr/local/nvidia/lib64:/usr/local/nvidia/lib:$LD_LIBRARY_PATH
       volumeMounts:
         - name: model-storage
           mountPath: /model
