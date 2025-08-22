@@ -10,9 +10,9 @@ spec:
       command: ["sleep", "infinity"]
       resources:
         requests:
-          nvidia.com/microgpu: 1
+          nvidia.com/gpu: 1
         limits:
-          nvidia.com/microgpu: 1
+          nvidia.com/gpu: 1
 
       volumeMounts:
         - name: model-storage
