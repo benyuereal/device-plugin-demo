@@ -23,10 +23,10 @@ spec:
         - name: nvidia-bin
           mountPath: /usr/local/nvidia/bin
         # 新增：挂载宿主机库目录
-        - name: nvidia-lib
-          mountPath: /usr/lib/x86_64-linux-gnu
-        - name: nvidia-lib64
-          mountPath: /usr/lib64
+#        - name: nvidia-lib
+#          mountPath: /usr/lib/x86_64-linux-gnu
+#        - name: nvidia-lib64
+#          mountPath: /usr/lib64
   volumes:
     - name: model-storage
       hostPath:
@@ -37,11 +37,11 @@ spec:
         path: /usr/bin
         type: Directory
     # 新增：宿主机库目录
-    - name: nvidia-lib
-      hostPath:
-        path: /usr/lib/x86_64-linux-gnu
-        type: Directory
-    - name: nvidia-lib64
-      hostPath:
-        path: /usr/lib64
-        type: Directory
+#    - name: nvidia-lib
+#      hostPath:
+#        path: /usr/lib/x86_64-linux-gnu
+#        type: Directory
+#    - name: nvidia-lib64
+#      hostPath:
+#        path: /usr/lib64
+#        type: Directory
