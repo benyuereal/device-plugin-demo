@@ -17,28 +17,31 @@ spec:
       volumeMounts:
         - name: model-storage
           mountPath: /model
-        - name: nvidia-bin
-          mountPath: /usr/local/nvidia/bin
-        # 新增：挂载宿主机库目录
-        - name: nvidia-lib
-          mountPath: /usr/lib/x86_64-linux-gnu
-        - name: nvidia-lib64
-          mountPath: /usr/lib64
+        # 仅挂载 NVIDIA 特定库文件，而不是整个目录
+        - name: nvidia-libs
+          mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so
+          subPath: libnvidia-ml.so
+        - name: nvidia-libs
+          mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+          subPath: libnvidia-ml.so.1
+        - name: nvidia-libs
+          mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.550.127.08
+          subPath: libnvidia-ml.so.550.127.08
   volumes:
     - name: model-storage
       hostPath:
         path: /home/Qwen1.5-0.5B-Chat
         type: Directory
-    - name: nvidia-bin
-      hostPath:
-        path: /usr/bin
-        type: Directory
+#    - name: nvidia-bin
+#      hostPath:
+#        path: /usr/bin
+#        type: Directory
     # 新增：宿主机库目录
     - name: nvidia-lib
       hostPath:
         path: /usr/lib/x86_64-linux-gnu
         type: Directory
-    - name: nvidia-lib64
-      hostPath:
-        path: /usr/lib64
-        type: Directory
+#    - name: nvidia-lib64
+#      hostPath:
+#        path: /usr/lib64
+#        type: Directory
