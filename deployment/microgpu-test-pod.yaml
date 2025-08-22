@@ -20,13 +20,8 @@ spec:
       volumeMounts:
         - name: model-storage
           mountPath: /model
-        - name: control-devices
-          mountPath: /dev/nvidia0
         - name: nvidia-bin
           mountPath: /usr/local/nvidia/bin
-        # 添加库文件挂载
-        - name: nvidia-lib
-          mountPath: /usr/lib/x86_64-linux-gnu
   volumes:
     - name: model-storage
       hostPath:
@@ -35,14 +30,4 @@ spec:
     - name: nvidia-bin
       hostPath:
         path: /usr/bin
-        type: Directory
-    # 添加库文件卷
-    - name: nvidia-lib
-      hostPath:
-        path: /usr/lib/x86_64-linux-gnu
-        type: Directory
-    # 控制设备
-    - name: control-devices
-      hostPath:
-        path: /dev
         type: Directory
