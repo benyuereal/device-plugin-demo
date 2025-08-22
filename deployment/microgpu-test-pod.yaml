@@ -37,7 +37,7 @@ spec:
 #        path: /usr/bin
 #        type: Directory
     # 新增：宿主机库目录
-    - name: nvidia-lib
+    - name: nvidia-libs
       hostPath:
         path: /usr/lib/x86_64-linux-gnu
         type: Directory
