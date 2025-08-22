@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: microgpu-test
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: test-container
+      image: nvidia/cuda:12.4.0-base-ubuntu22.04
+      command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          # 安装必要工具
+          apt update && apt install -y curl
+          # 验证设备可见性
+          echo "列出所有设备:"
+          nvidia-smi -L
+          echo ""
+          echo "MIG 设备详情:"
+          nvidia-smi mig -lgi
+          echo ""
+          echo "CUDA 设备查询:"
+          /usr/local/cuda/extras/demo_suite/deviceQuery
+      resources:
+        limits:
+          nvidia.com/microgpu: 1  # 请求一个 microgpu 资源

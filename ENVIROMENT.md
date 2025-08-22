@@ -74,8 +74,18 @@ minikube start \
   --gpus=nvidia \
   --container-runtime=docker \
   --image-repository=registry.aliyuncs.com/google_containers \
-  --docker-env HTTP_PROXY=http://192.168.10.159:7890 \
-  --docker-env HTTPS_PROXY=http://192.168.10.159:7890 \
+  --docker-env HTTP_PROXY=http://10.0.168.50:7890 \
+  --docker-env HTTPS_PROXY=http://10.0.168.50:7890 \
+  --alsologtostderr -v=8
+  
+  
+  minikube start \
+  --driver=docker \
+  --gpus=nvidia \
+  --container-runtime=docker \
+  --image-repository=registry.aliyuncs.com/google_containers \
+  --docker-env HTTP_PROXY=http://10.0.168.50:7890 \
+  --docker-env HTTPS_PROXY=http://10.0.168.50:7890 \
   --alsologtostderr -v=8
   
 ###
