@@ -13,16 +13,16 @@ spec:
           nvidia.com/microgpu: 1
         limits:
           nvidia.com/microgpu: 1
-      volumeMounts:
-        - name: model-storage
-          mountPath: /model
-        - name: cuda-lib
-          mountPath: /usr/local/nvidia/lib64
-  volumes:
-    - name: model-storage
-      hostPath:
-        path: /home/k8sadmin/Qwen1.5-0.5B-Chat
-        type: Directory
-    - name: cuda-lib
-      hostPath:
-        path: /usr/lib/x86_64-linux-gnu
+#      volumeMounts:
+#        - name: model-storage
+#          mountPath: /model
+#        - name: cuda-lib
+#          mountPath: /usr/local/nvidia/lib64
+#  volumes:
+#    - name: model-storage
+#      hostPath:
+#        path: /home/k8sadmin/Qwen1.5-0.5B-Chat
+#        type: Directory
+#    - name: cuda-lib
+#      hostPath:
+#        path: /usr/lib/x86_64-linux-gnu
