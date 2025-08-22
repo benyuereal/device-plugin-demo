@@ -16,12 +16,18 @@ spec:
       volumeMounts:
         - name: model-storage
           mountPath: /model
-#        - name: cuda-lib
-#          mountPath: /usr/local/nvidia/lib64
+        # 新增nvidia-smi挂载
+        - name: nvidia-bin
+          mountPath: /usr/local/nvidia/bin  # 容器内标准路径
   volumes:
     - name: model-storage
       hostPath:
         path: /home/Qwen1.5-0.5B-Chat
+        type: Directory
+    # 新增宿主机二进制挂载
+    - name: nvidia-bin
+      hostPath:
+        path: /usr/bin  # 宿主机nvidia-smi所在目录
         type: Directory
 #    - name: cuda-lib
 #      hostPath:
