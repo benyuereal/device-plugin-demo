@@ -14,14 +14,19 @@ spec:
         limits:
           nvidia.com/microgpu: 1
       env:
-        # 关键：添加库路径环境变量
+        # 确保包含所有可能的库路径
         - name: LD_LIBRARY_PATH
-          value: /usr/lib/x86_64-linux-gnu:/usr/local/nvidia/lib64:/usr/local/nvidia/lib:$LD_LIBRARY_PATH
+          value: /usr/lib/x86_64-linux-gnu:/usr/lib64:/usr/lib:/usr/local/nvidia/lib64:/usr/local/nvidia/lib:$LD_LIBRARY_PATH
       volumeMounts:
         - name: model-storage
           mountPath: /model
         - name: nvidia-bin
           mountPath: /usr/local/nvidia/bin
+        # 新增：挂载宿主机库目录
+        - name: nvidia-lib
+          mountPath: /usr/lib/x86_64-linux-gnu
+        - name: nvidia-lib64
+          mountPath: /usr/lib64
   volumes:
     - name: model-storage
       hostPath:
@@ -30,4 +35,13 @@ spec:
     - name: nvidia-bin
       hostPath:
         path: /usr/bin
+        type: Directory
+    # 新增：宿主机库目录
+    - name: nvidia-lib
+      hostPath:
+        path: /usr/lib/x86_64-linux-gnu
+        type: Directory
+    - name: nvidia-lib64
+      hostPath:
+        path: /usr/lib64
         type: Directory
