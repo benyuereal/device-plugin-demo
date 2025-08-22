@@ -8,7 +8,7 @@ kubectl apply -f deployment/qwen-mini.yaml
 kubectl apply -f deployment/gpu-test.yaml
 kubectl apply -f deployment/kuda-test.yaml
 kubectl apply -f deployment/microgpu-test-pod.yaml
-kubectl apply -f microgpu-test-pod.yaml
+kubectl apply -f deployment/microgpu-test.yaml
 
 ```
 
@@ -29,6 +29,7 @@ kubectl exec -it qwen-mini-0 -- bash
 
 
 kubectl get pod microgpu-test -w
+kubectl describe pod -l microgpu-test
 
 kubectl logs microgpu-test -f
 

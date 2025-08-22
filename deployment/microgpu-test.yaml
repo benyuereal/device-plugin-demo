@@ -11,17 +11,23 @@ spec:
         - "/bin/bash"
         - "-c"
         - |
-          # 安装必要工具
-          apt update && apt install -y curl
           # 验证设备可见性
           echo "列出所有设备:"
-          nvidia-smi -L
+          /usr/bin/nvidia-smi -L  # 使用完整路径
           echo ""
           echo "MIG 设备详情:"
-          nvidia-smi mig -lgi
+          /usr/bin/nvidia-smi mig -lgi  # 使用完整路径
           echo ""
           echo "CUDA 设备查询:"
-          /usr/local/cuda/extras/demo_suite/deviceQuery
+          if [ -f "/usr/local/cuda/extras/demo_suite/deviceQuery" ]; then
+            /usr/local/cuda/extras/demo_suite/deviceQuery
+          else
+            echo "deviceQuery not found, installing cuda-samples..."
+            apt update && apt install -y cuda-samples-12-4
+            cd /usr/local/cuda/samples/1_Utilities/deviceQuery
+            make
+            ./deviceQuery
+          fi
       resources:
         limits:
-          nvidia.com/microgpu: 1  # 请求一个 microgpu 资源
+          nvidia.com/microgpu: 1
