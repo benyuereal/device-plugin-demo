@@ -95,4 +95,14 @@ kubectl run gpu-test --image=nvcr.io/nvidia/cuda:12.3.0-base \
 ### 方法 4：验证挂载点注入
 # 检查挂载点
 kubectl logs gpu-test | grep -A 5 "Devices"
+
+
+sudo ctr run --rm --runtime io.containerd.runtime.v1.linux \
+  --gpus 0 \
+  nvcr.io/nvidia/pytorch:24.05-py3 nvidia-test \
+  nvidia-smi
+
+nvcr.io/nvidia/pytorch:24.05-py3
+
+docker pull nvidia/cuda:12.4.0-base-ubuntu22.04
 ```
