@@ -4,6 +4,7 @@ metadata:
   name: microgpu-test-pod
 spec:
   restartPolicy: Never
+  runtimeClassName: nvidia  # Pod 中引用此 RuntimeClass
   containers:
     - name: qwen-inference
       image: nvcr.io/nvidia/pytorch:24.05-py3

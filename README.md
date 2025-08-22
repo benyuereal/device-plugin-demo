@@ -51,3 +51,48 @@ docker run --runtime=nvidia \
     nvidia/cuda nvidia-smi
 
 ```
+
+
+###
+
+```shell
+sudo vim /etc/containerd/config.toml
+
+
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+    privileged_without_host_devices = false
+    runtime_type = "io.containerd.runc.v2"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+      BinaryName = "/usr/bin/nvidia-container-runtime"
+      
+      
+      
+ # 创建测试容器
+kubectl run test-runtime --image=ubuntu --restart=Never \
+  --runtime-class=nvidia -- sleep infinity
+
+# 获取容器ID
+CONTAINER_ID=$(sudo crictl ps -n test-runtime -q)
+
+# 检查运行时类型
+sudo crictl inspect $CONTAINER_ID | jq '.info.runtimeSpec.annotations'
+
+
+#### 预期输出
+
+{
+  "io.kubernetes.cri.container-type": "CONTAINER",
+  "io.kubernetes.cri-o.CgroupManager": "systemd",
+  "io.kubernetes.cri-o.Devices": "/dev/nvidia0:/dev/nvidia0...", // 关键！
+  "io.kubernetes.cri-o.Annotations": "..."
+}
+
+# 创建 GPU 测试容器
+kubectl run gpu-test --image=nvcr.io/nvidia/cuda:12.3.0-base \
+  --runtime-class=nvidia -- nvidia-smi
+
+### 方法 4：验证挂载点注入
+# 检查挂载点
+kubectl logs gpu-test | grep -A 5 "Devices"
+```
