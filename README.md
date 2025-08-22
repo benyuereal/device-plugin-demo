@@ -36,6 +36,13 @@ kubectl delete pod microgpu-test
 
 kubectl logs microgpu-test -f
 
+
+
+kubectl apply -f deployment/nvidia-test-pod.yaml
+kubectl describe pod nvidia-test-pod
+kubectl delete pod nvidia-test-pod
+kubectl logs nvidia-test-pod --tail=-1
+
 # 检查CUDA
 nvidia-smi
 ls -l /usr/local/cuda

@@ -11,4 +11,4 @@ spec:
       command: ["nvidia-smi"]
       resources:
         limits:
-          nvidia.com/gpu: 1  # 请求 1 个 GPU
+          nvidia.com/microgpu: 1  # 请求 1 个 GPU
