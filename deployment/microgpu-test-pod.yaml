@@ -23,13 +23,3 @@ spec:
       hostPath:
         path: /home/Qwen1.5-0.5B-Chat
         type: Directory
-#    - name: nvidia-bin
-#      hostPath:
-#        path: /usr/bin
-#        type: Directory
-    # 新增：宿主机库目录
-
-#    - name: nvidia-lib64
-#      hostPath:
-#        path: /usr/lib64
-#        type: Directory
