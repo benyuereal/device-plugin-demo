@@ -3,32 +3,39 @@ kind: Pod
 metadata:
   name: microgpu-test-pod
 spec:
-  restartPolicy: Never  # 执行完成后不重启
+  restartPolicy: Never
   containers:
     - name: qwen-inference
       image: nvcr.io/nvidia/pytorch:24.05-py3
-      command: ["sleep", "infinity"]  # 保持容器运行
+      command: ["sleep", "infinity"]
       resources:
         requests:
           nvidia.com/microgpu: 1
         limits:
           nvidia.com/microgpu: 1
+      env:
+        # 关键：添加库路径环境变量
+        - name: LD_LIBRARY_PATH
+          value: /usr/lib/x86_64-linux-gnu:/usr/local/nvidia/lib64:/usr/local/nvidia/lib:$LD_LIBRARY_PATH
       volumeMounts:
         - name: model-storage
           mountPath: /model
-        # 新增nvidia-smi挂载
         - name: nvidia-bin
-          mountPath: /usr/local/nvidia/bin  # 容器内标准路径
+          mountPath: /usr/local/nvidia/bin
+        # 添加库文件挂载
+        - name: nvidia-lib
+          mountPath: /usr/lib/x86_64-linux-gnu
   volumes:
     - name: model-storage
       hostPath:
         path: /home/Qwen1.5-0.5B-Chat
         type: Directory
-    # 新增宿主机二进制挂载
     - name: nvidia-bin
       hostPath:
-        path: /usr/bin  # 宿主机nvidia-smi所在目录
+        path: /usr/bin
         type: Directory
-#    - name: cuda-lib
-#      hostPath:
-#        path: /usr/lib/x86_64-linux-gnu
+    # 添加库文件卷
+    - name: nvidia-lib
+      hostPath:
+        path: /usr/lib/x86_64-linux-gnu
+        type: Directory
