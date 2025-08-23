@@ -9,7 +9,8 @@ spec:
     - name: test-container
       image: nvcr.io/nvidia/pytorch:24.05-py3
       imagePullPolicy: IfNotPresent  # 关键修改：优先使用本地镜像
-      command: ["nvidia-smi", "nvidia-smi -L"]
+      command: ["nvidia-smi -L"]
+      args: [ "sleep", "infinity" ]
       resources:
         limits:
           nvidia.com/microgpu: 1

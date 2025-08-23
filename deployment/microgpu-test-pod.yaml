@@ -8,7 +8,7 @@ spec:
   containers:
     - name: qwen-inference
       image: nvcr.io/nvidia/pytorch:24.05-py3
-      command: ["/opt/nvidia/nvidia_entrypoint.sh"]  # 显式调用入口点
+      command: ["nvidia-smi"]  # 显式调用入口点
       args: ["sleep", "infinity"]
       resources:
         requests:
