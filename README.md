@@ -9,6 +9,7 @@ kubectl apply -f deployment/gpu-test.yaml
 kubectl apply -f deployment/kuda-test.yaml
 kubectl apply -f deployment/microgpu-test-pod.yaml
 kubectl apply -f deployment/microgpu-test.yaml
+kubectl apply -f deployment/nvidia-test-pod.yaml
 
 ```
 

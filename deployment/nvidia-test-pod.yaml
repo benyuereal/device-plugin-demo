@@ -3,12 +3,13 @@ kind: Pod
 metadata:
   name: nvidia-test-pod
 spec:
-  runtimeClassName: nvidia  # 使用 NVIDIA 运行时
-  restartPolicy: Never  # 执行一次后退出
+  runtimeClassName: nvidia
+  restartPolicy: Never
   containers:
     - name: test-container
       image: nvcr.io/nvidia/pytorch:24.05-py3
+      imagePullPolicy: IfNotPresent  # 关键修改：优先使用本地镜像
       command: ["nvidia-smi"]
       resources:
         limits:
-          nvidia.com/microgpu: 1  # 请求 1 个 GPU
+          nvidia.com/microgpu: 1
