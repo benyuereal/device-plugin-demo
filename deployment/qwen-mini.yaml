@@ -75,7 +75,7 @@ spec:
       volumes:
         - name: model-storage
           hostPath:
-            path: /home/k8sadmin/Qwen1.5-0.5B-Chat
+            path: /home/Qwen1.5-0.5B-Chat
             type: Directory
   # StatefulSet更新策略
   updateStrategy:

@@ -40,6 +40,11 @@ kubectl delete pod microgpu-test
 kubectl logs microgpu-test -f
 
 
+### 临时的pod用来做申请gpu占用
+kubectl apply -f deployment/nvidia-tmp-pod.yaml
+kubectl describe pod nvidia-tmp-pod
+kubectl delete pod nvidia-tpm-pod
+kubectl logs nvidia-tpm-pod --tail=-1
 
 kubectl apply -f deployment/nvidia-test-pod.yaml
 kubectl describe pod nvidia-test-pod
