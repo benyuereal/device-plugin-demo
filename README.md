@@ -45,6 +45,7 @@ kubectl apply -f deployment/nvidia-test-pod.yaml
 kubectl describe pod nvidia-test-pod
 kubectl delete pod nvidia-test-pod
 kubectl logs nvidia-test-pod --tail=-1
+kubectl exec -it nvidia-test-pod -- sh
 
 # 检查CUDA
 nvidia-smi
