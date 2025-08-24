@@ -274,7 +274,7 @@ curl -X POST http://${MINIKUBE_IP}:30080/generate \
     }
   }'
   
-  curl -X POST http://192.168.49.2:30080/generate \
+  curl -X POST http://10.0.168.12:30080/generate \
   -H "Content-Type: application/json" \
   -d '{
     "inputs": "<|im_start|>system\n你是一个AI助手<|im_end|>\n<|im_start|>user\n请用简单的话解释量子计算<|im_end|>\n<|im_start|>assistant\n",
