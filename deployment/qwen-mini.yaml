@@ -29,46 +29,28 @@ spec:
       containers:
         - name: text-generation
           image: ghcr.io/huggingface/text-generation-inference:1.4.1
-          command: ["text-generation-launcher"]
+          command: [ "/bin/sh", "-c" ]
           args:
-            - "--model-id"
-            - "/model"
-            - "--num-shard"
-            - "1"
-            - "--port"
-            - "8000"
-            - "--quantize"
-            - "bitsandbytes"
+            - >
+              # 检查CUDA可用性
+              echo "===== 开始CUDA检查 =====";
+              python -c "import torch; print('CUDA available:', torch.cuda.is_available())" > /proc/1/fd/1;
+              nvidia-smi > /proc/1/fd/1 2>&1 || echo 'nvidia-smi未找到！';
+              echo "===== CUDA检查结束 =====";
+
+              # 运行原始命令（无量化）
+              text-generation-launcher --model-id /model --num-shard 1 --port 8000 > /proc/1/fd/1 2>/tmp/error.log;
+
+              # 保持容器运行
+              echo "===== 容器进入调试模式 =====";
+              sleep infinity
           env:
             - name: TRANSFORMERS_OFFLINE
               value: "1"
             - name: HF_HUB_OFFLINE
               value: "1"
-            - name: NVIDIA_DISABLE_REQUIRE
-              value: "1"
-          # 添加就绪探针，确保Pod完全启动后才被认为是就绪
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            failureThreshold: 10
-            timeoutSeconds: 5
-          # 添加存活探针，确保应用健康
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 60
-            periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 5
-          resources:
-            limits:
-              nvidia.com/microgpu: 1
-          ports:
-            - containerPort: 8000
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all  # 关键！暴露GPU设备
           volumeMounts:
             - name: model-storage
               mountPath: /model
