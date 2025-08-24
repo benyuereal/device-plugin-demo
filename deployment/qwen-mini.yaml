@@ -6,7 +6,7 @@ metadata:
 spec:
   serviceName: "qwen-service"
   replicas: 1
-  podManagementPolicy: OrderedReady  # 确保一次只处理一个Pod
+  podManagementPolicy: OrderedReady
   selector:
     matchLabels:
       app: qwen
@@ -15,7 +15,7 @@ spec:
       labels:
         app: qwen
     spec:
-      terminationGracePeriodSeconds: 120  # 给Pod足够的时间优雅终止
+      terminationGracePeriodSeconds: 120
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -29,28 +29,16 @@ spec:
       containers:
         - name: text-generation
           image: ghcr.io/huggingface/text-generation-inference:1.4.1
-          command: [ "/bin/sh", "-c" ]
+          command: ["/bin/sh", "-c"]
           args:
-            - >
-              # 检查CUDA可用性
-              echo "===== 开始CUDA检查 =====";
-              python -c "import torch; print('CUDA available:', torch.cuda.is_available())" > /proc/1/fd/1;
-              nvidia-smi > /proc/1/fd/1 2>&1 || echo 'nvidia-smi未找到！';
-              echo "===== CUDA检查结束 =====";
-
-              # 运行原始命令（无量化）
-              text-generation-launcher --model-id /model --num-shard 1 --port 8000 > /proc/1/fd/1 2>/tmp/error.log;
-
-              # 保持容器运行
-              echo "===== 容器进入调试模式 =====";
-              sleep infinity
+            - "echo '容器已启动，等待手动调试...'; sleep infinity"  # 只等待不执行
           env:
             - name: TRANSFORMERS_OFFLINE
               value: "1"
             - name: HF_HUB_OFFLINE
               value: "1"
             - name: NVIDIA_VISIBLE_DEVICES
-              value: all  # 关键！暴露GPU设备
+              value: all
           volumeMounts:
             - name: model-storage
               mountPath: /model
@@ -59,11 +47,10 @@ spec:
           hostPath:
             path: /home/Qwen1.5-0.5B-Chat
             type: Directory
-  # StatefulSet更新策略
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      partition: 0  # 确保有序更新
+      partition: 0
 
 ---
 apiVersion: v1
