@@ -15,27 +15,15 @@ spec:
       labels:
         app: qwen
     spec:
-      terminationGracePeriodSeconds: 120
       # 新增拓扑分布约束 - 核心修改点
       topologySpreadConstraints:
-        - maxSkew: 1  # 节点间最大Pod数差异
+        - maxSkew: 2  # 节点间最大Pod数差异
           topologyKey: kubernetes.io/hostname  # 节点级别的拓扑域
           whenUnsatisfiable: DoNotSchedule  # 不满足条件时不调度
           labelSelector:
             matchLabels:
               app: qwen
-      # 修改反亲和性为软约束
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:  # 改为偏好性而非强制性
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values: ["qwen"]
-                topologyKey: kubernetes.io/hostname
+
       runtimeClassName: nvidia
       containers:
         - name: text-generation
