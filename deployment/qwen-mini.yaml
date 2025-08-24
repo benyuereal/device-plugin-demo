@@ -26,6 +26,7 @@ spec:
                     values:
                       - qwen
               topologyKey: kubernetes.io/hostname
+      runtimeClassName: nvidia
       containers:
         - name: text-generation
           image: ghcr.io/huggingface/text-generation-inference:1.4.1
